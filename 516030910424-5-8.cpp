@@ -13,17 +13,25 @@ int judge(char a[15], char b[15]) {
 	return 1;
 }
 void q_sort(int l, int r) {
+	if (l == r) { return; }
 	int i = l;
 	int j = r;
 	char v1[15];
-	for (int i = 0; i < n; i++) { v1[i] = a[(l + r) / 2][i]; }
+ 	for (int i = 0; i < n; i++) { v1[i] = a[(l + r) / 2][i]; }
 	int v = b[(l + r) / 2];
 	while (i <= j) {
-		while ((judge(a[i], v1) == 0) || (judge(a[i], v1) == 1) && (b[i] < v)) { i += 1; }
-		while ((judge(a[j], v1) == 2) || (judge(a[j], v1) == 1) && (b[j] > v)) { j -= 1; }
+		while ((judge(a[i], v1) == 0) || ((judge(a[i], v1) == 1) && (b[i] < v))) { i += 1; }
+		while ((judge(a[j], v1) == 2) || ((judge(a[j], v1) == 1) && (b[j] > v))) { j -= 1; }
 		if (i <= j) {
-			for (int v = 0; v < n; v++) { a[i][v], a[j][v] = a[j][v], a[i][v]; }
-			b[i], b[j] = b[j], b[i];
+			for (int x = 0; x < n; x++) {
+				a[m + 1][x] = a[i][x];
+				a[i][x] = a[j][x];
+				a[j][x] = a[m + 1][x];
+			}
+			int t;
+			t = b[i];
+			b[i] = b[j];
+			b[j] = t;
 			i += 1;
 			j -= 1;
 		}
@@ -31,7 +39,8 @@ void q_sort(int l, int r) {
 	if (i < r) { q_sort(i, r); }
 	if (l < j) { q_sort(l, j); }
 }
-void qsort(int l, int r) {
+void qsort(int l, int r){
+	if (l == r) { return; }
 	int i = l;
 	int j = r;
 	int v = sum[(i + j) / 2];
@@ -39,9 +48,18 @@ void qsort(int l, int r) {
 		while (sum[i] > v) { i += 1; }
 		while (sum[j] < v) { j -= 1; }
 		if (i <= j) {
-			sum[i], sum[j] = sum[j], sum[i];
-			for (int x = 0; x < n; x++) { q[i][x], q[j][x] = q[j][x], q[i][x]; }
-			start[i], start[j] = start[j], start[i];
+			int t;
+			t = sum[i];
+			sum[i] = sum[j];
+			sum[j] = t;
+			for (int x = 0; x < n; x++) {
+				a[m + 1][x] = q[i][x];
+				q[i][x] = q[j][x];
+				q[j][x] = a[m + 1][x];
+			}
+			t = start[i];
+			start[i] = start[j];
+			start[j] = t;
 			i += 1;
 			j -= 1;
 		}
@@ -69,11 +87,8 @@ int main() {
 		k += 1;
 	}
 	f.close();
+
 	q_sort(0, m);
-	for (int i = 0; i < 10; i++) {
-		for (int j = 0; j < n; j++) { cout << a[i][j]; }
-		cout << endl;
-	}
 	k = 0;
 	start[0] = 0;
 	for (int i = 0; i < n; i++) { q[0][i] = a[0][i]; }
@@ -87,30 +102,32 @@ int main() {
 	}
 	sum[k] = m - start[k] + 1;
 	qsort(0, k);
-	cout << k << endl;
 	for (int i = 0; i < 10; i++) {
 		for (int j = 0; j < n; j++) { cout << q[i][j]; }
 		cout << ' ' << sum[i] << endl;
 	}
 	string s;
-	cin >> s;
-	for (int i = 0; i < n; i++) { a[m + 1][i] = s[i]; }
-	int i = 0;
-	while (i <= k&&judge(a[m + 1], q[i]) != 1) { i += 1; }
-	if (i > k) {
-		cout << '0' << endl;
-		return 0;
-	}
-	ifstream ff("EnglishWords.txt");
-	i = start[i];
-	cout << sum[i]<<endl;
-	for (int j = 0; j < m; j++) {
-		ff.getline(c, 100);
-		if (j == b[i]) { 
-			cout << c << endl;
-			i += 1;
+	while (cin) {
+		cin >> s;
+		for (int i = 0; i < n; i++) { a[m + 1][i] = s[i]; }
+		int i = 0;
+		while (i <= k&&judge(a[m + 1], q[i]) != 1) { i += 1; }
+		if (i > k) {
+			cout << '0' << endl;
+		}
+		else {
+			ifstream ff("EnglishWords.txt");
+			cout << sum[i] << endl;
+			i = start[i];
+			for (int j = 0; j < m; j++) {
+				ff.getline(c, 100);
+				if (j == b[i]) {
+					cout << c << endl;
+					i += 1;
+				}
+			}
+			ff.close();
 		}
 	}
-	ff.close();
 	return 0;
 }
